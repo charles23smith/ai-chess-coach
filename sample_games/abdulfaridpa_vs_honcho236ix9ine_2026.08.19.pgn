@@ -1,0 +1,36 @@
+[Event "Live Chess"]
+[Site "Chess.com"]
+[Date "2026.08.19"]
+[Round "-"]
+[White "abdulfaridpa"]
+[Black "honcho236ix9ine"]
+[Result "0-1"]
+[CurrentPosition "8/5p2/5nk1/8/8/1p3PK1/8/8 w - - 0 47"]
+[Timezone "UTC"]
+[ECO "D00"]
+[ECOUrl "https://www.chess.com/openings/Queens-Pawn-Opening-1...d5-2.e3"]
+[UTCDate "2026.08.19"]
+[UTCTime "01:13:06"]
+[WhiteElo "1079"]
+[BlackElo "1104"]
+[TimeControl "600"]
+[Termination "honcho236ix9ine won - game abandoned"]
+[StartTime "01:13:06"]
+[EndDate "2026.08.19"]
+[EndTime "01:21:41"]
+[Link "https://www.chess.com/analysis/game/live/173196496824/analysis?flip=true"]
+[WhiteUrl "https://www.chess.com/bundles/web/images/noavatar_l.84a92436.gif"]
+[WhiteCountry "9"]
+[WhiteTitle ""]
+[BlackUrl "https://www.chess.com/bundles/web/images/noavatar_l.84a92436.gif"]
+[BlackCountry "2"]
+[BlackTitle ""]
+
+1. d4 d5 2. e3 Nc6 3. c4 dxc4 4. Bxc4 Nf6 5. Bb5 Bd7 6. Nf3 e6 7. O-O Bd6 8.
+Nbd2 O-O 9. a3 h6 10. b4 Re8 11. Bb2 e5 12. dxe5 Nxe5 13. Nxe5 Bxe5 14. Bxe5
+Rxe5 15. Bxd7 Qxd7 16. Nf3 Rd5 17. Qxd5 Qxd5 18. Rfd1 Qe4 19. Nd4 Rd8 20. Nb5
+Rxd1+ 21. Rxd1 Kh7 22. Nxc7 g5 23. h3 h5 24. Nb5 a6 25. Nd4 g4 26. hxg4 Qxg4 27.
+f3 Qg5 28. a4 Qxe3+ 29. Kh1 h4 30. b5 axb5 31. Nxb5 Qg5 32. Rd4 h3 33. gxh3 Qg3
+34. Rd3 Qxh3+ 35. Kg1 Qe6 36. Nd4 Qc4 37. Rd1 Qxa4 38. Rd2 Qb4 39. Rh2+ Kg6 40.
+Ne2 Qe1+ 41. Kg2 Qxe2+ 42. Kg3 Qe5+ 43. Kg2 b5 44. Rh3 b4 45. Rg3+ Qxg3+ 46.
+Kxg3 b3 0-1
