@@ -18,4 +18,4 @@ if uploaded_games:
         pgn_file = io.StringIO(pgn_text)
         pgn = parse_pgn(pgn_file)
 
-        st.write(pgn["White"])
+        
