@@ -7,19 +7,13 @@ def get_engine():
     return chess.engine.SimpleEngine.popen_uci(ENGINE_PATH)
 
 
-# Returns int in centipawns of evaluation of the position (positive -> white is better)
-# Mate is represented by a large number (10000)
-def board_eval(engine, board) -> int:
-    info = engine.analyse(board, chess.engine.Limit(depth=15))
-    score = info["score"].white().score(mate_score=10000)
-    
-    return score
+def analyze_position(engine, board):
+    info = engine.analyse(
+        board, 
+        chess.engine.Limit(time=0.1)
+    )
 
-# Returns str of Stockfish's chosen best move in UCI notation (e.g. "e2e4"), 
-# found within the specified time
-def best_move(engine, board) -> str:
-    result = engine.play(board, chess.engine.Limit(time=0.5))
-    
-    return result.move.uci()
+    evaluation = info["score"].pov(chess.WHITE).score(mate_score = 100000)
+    best_move = info["pv"][0].uci()
 
-
+    return evaluation, best_move

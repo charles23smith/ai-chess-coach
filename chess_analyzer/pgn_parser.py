@@ -1,5 +1,6 @@
 import chess.pgn
-from .engine import board_eval, best_move, get_engine
+from .engine import get_engine, analyze_position
+from .classifier import classify_move
 
 def parse_pgn(file):
     game = chess.pgn.read_game(file)
@@ -12,17 +13,16 @@ def parse_pgn(file):
     }
 
     engine = get_engine()
+    evalBefore, bestMove = analyze_position(engine, board)
     
     for move in game.mainline_moves():
-        evalBefore = board_eval(engine, board)
-        bestMove = best_move(engine, board)
         san = board.san(move)
         uci = move.uci()
         move_num = board.fullmove_number
         color = "WHITE" if board.turn == chess.WHITE else "BLACK"
 
         board.push(move)
-        evalAfter = board_eval(engine, board)
+        evalAfter, next_best_move = analyze_position(engine, board)
 
         #evalLoss represents how much worse a player's position becomes
         if color == "WHITE":
@@ -32,6 +32,11 @@ def parse_pgn(file):
 
         #0 evalLoss if the position improves
         evalLoss = max(0, evalLoss)
+        classification = classify_move(uci, bestMove, evalLoss)
+
+        #String notation to rebuild the entire board 
+        fen = board.fen()
+
 
         move_data = {
             "San": san, 
@@ -41,11 +46,16 @@ def parse_pgn(file):
             "EvalBefore": evalBefore, 
             "EvalAfter": evalAfter, 
             "BestMove": bestMove, 
-            "EvalLoss": evalLoss
+            "EvalLoss": evalLoss, 
+            "Classification": classification, 
+            "Fen": fen
         }
         game_data["Moves"].append(move_data)
 
-        
+        evalBefore = evalAfter
+        bestMove = next_best_move
+
+
     engine.quit()
 
     return game_data
