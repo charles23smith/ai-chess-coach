@@ -10,3 +10,5 @@ def classify_move(uci, best_move, eval_loss):
         classification = "Mistake"
     else:
         classification = "Blunder"
+
+    return classification

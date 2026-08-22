@@ -1,7 +1,8 @@
-from chess_analyzer.pgn_parser import parse_pgn
-from chess_analyzer.board_view import display_chess_board
 import streamlit as st 
 import io
+from chess_analyzer.pgn_parser import parse_pgn
+from chess_analyzer.board_view import display_chess_board
+
 
 st.title("AI-Chess-App")
 
