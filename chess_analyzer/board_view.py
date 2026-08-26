@@ -27,13 +27,14 @@ def display_chess_board(game_data):
     if st.session_state["move_index"] == -1:
         board = chess.Board()
         eval_score = game_data["Moves"][0]["EvalBefore"]
-    
+        mate_in = game_data["Moves"][0]["MateAfter"]
         fill = {}
     else:
         current_move = game_data["Moves"][st.session_state["move_index"]]
         board = chess.Board(current_move["Fen"])
         eval_score = current_move["EvalAfter"]
-
+        mate_in = current_move["MateAfter"]
+        
         #highlight squares to show moves
         current_move = game_data["Moves"][st.session_state["move_index"]]
         uci = current_move["Uci"]
@@ -46,12 +47,21 @@ def display_chess_board(game_data):
         }
 
     #Evaluation bar
-    white_percent = eval_to_white_percent(eval_score)
-    black_percent = 100 - white_percent
+    if mate_in is not None:
+        if mate_in > 0:
+            white_percent = 100
+            eval_display = f'M{mate_in}'
+        else:
+            white_percent = 0 
+            eval_display = f'M{abs(mate_in)}'
+    else:
+        white_percent = eval_to_white_percent(eval_score)
+        eval_display = f'{eval_score / 100:+.2f}'
+
+    black_percent = 100 - white_percent 
     eval_col, board_col = st.columns([1,8])
     
     with eval_col:
-        eval_display = eval_score / 100
     
         bar_html = textwrap.dedent(f"""
         <div style="
@@ -71,7 +81,7 @@ def display_chess_board(game_data):
             "></div>
         </div>
         <div style="text-align:center;">
-            {eval_display:+.2f}
+            {eval_display}
         </div>
         """)
 

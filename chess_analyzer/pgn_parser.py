@@ -1,6 +1,6 @@
 import chess.pgn
 from .engine import get_engine, analyze_position
-from .classifier import classify_move
+from .classifier import classify_move, calculate_material_loss
 
 def parse_pgn(file):
     game = chess.pgn.read_game(file)
@@ -41,7 +41,7 @@ def parse_pgn(file):
     }
 
     engine = get_engine()
-    evalBefore, bestMove = analyze_position(engine, board)
+    evalBefore, bestMove, mateBefore, _ = analyze_position(engine, board)
     
     
     for move in game.mainline_moves():
@@ -51,7 +51,7 @@ def parse_pgn(file):
         color = "WHITE" if board.turn == chess.WHITE else "BLACK"
 
         board.push(move)
-        evalAfter, next_best_move = analyze_position(engine, board)
+        evalAfter, next_best_move, mateAfter, continuation = analyze_position(engine, board)
 
         #evalLoss represents how much worse a player's position becomes
         if color == "WHITE":
@@ -61,7 +61,20 @@ def parse_pgn(file):
 
         #0 evalLoss if the position improves
         evalLoss = max(0, evalLoss)
-        classification = classify_move(uci, bestMove, evalLoss)
+        player_color = chess.WHITE if color == "WHITE" else chess.BLACK
+        materialLoss = calculate_material_loss(
+            board, 
+            player_color, 
+            continuation[:4]
+        )
+        classification = classify_move(
+            uci, 
+            bestMove, 
+            evalLoss, 
+            materialLoss, 
+            mateBefore, 
+            mateAfter
+        )
 
         if color == "WHITE":
             if classification == "Best":
@@ -100,12 +113,16 @@ def parse_pgn(file):
             "BestMove": bestMove, 
             "EvalLoss": evalLoss, 
             "Classification": classification, 
-            "Fen": fen
+            "Fen": fen, 
+            "MateBefore": mateBefore, 
+            "MateAfter": mateAfter, 
+            "MaterialLoss": materialLoss
         }
         game_data["Moves"].append(move_data)
 
         evalBefore = evalAfter
         bestMove = next_best_move
+        mateBefore = mateAfter
 
     game_data["Stats"]["White"]["BestCount"] = whiteBest
     game_data["Stats"]["White"]["GoodCount"] = whiteGood

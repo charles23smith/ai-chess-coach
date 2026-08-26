@@ -13,7 +13,15 @@ def analyze_position(engine, board):
         chess.engine.Limit(time=0.1)
     )
 
-    evaluation = info["score"].pov(chess.WHITE).score(mate_score = 100000)
-    best_move = info["pv"][0].uci()
+    score = info["score"].pov(chess.WHITE)
 
-    return evaluation, best_move
+    if score.is_mate():
+        mate = score.mate()
+    else:
+        mate = None
+
+    evaluation = score.score(mate_score =100000)
+    continuation = info["pv"]
+    best_move = continuation[0].uci()
+
+    return evaluation, best_move, mate, continuation
