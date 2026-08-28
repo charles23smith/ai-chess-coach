@@ -16,6 +16,9 @@ def classify_move(
         mate_before, 
         mate_after
 ):
+
+    if material_loss >= 3 and eval_loss <= 50:
+        return "Brilliant"
     
     if uci == best_move:
         return "Best"

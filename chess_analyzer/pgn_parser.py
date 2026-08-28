@@ -6,11 +6,13 @@ def parse_pgn(file):
     game = chess.pgn.read_game(file)
     board = game.board()
 
+    whiteBrilliant = 0
     whiteBest = 0 
     whiteGood = 0 
     whiteInaccuracies = 0
     whiteMistakes = 0 
     whiteBlunders = 0 
+    blackBrilliant = 0
     blackBest = 0
     blackGood = 0
     blackInaccuracies = 0 
@@ -24,6 +26,7 @@ def parse_pgn(file):
         "Moves" : [], 
         "Stats": {
                 "White": {
+                    "Brilliant": whiteBrilliant, 
                     "BestCount": whiteBest, 
                     "GoodCount": whiteGood, 
                     "Inaccuracies": whiteInaccuracies, 
@@ -31,6 +34,7 @@ def parse_pgn(file):
                     "Blunders": whiteBlunders
                 },
                 "Black": {
+                    "Brilliant": blackBrilliant, 
                     "BestCount": blackBest, 
                     "GoodCount": blackGood, 
                     "Inaccuracies": blackInaccuracies, 
@@ -49,6 +53,8 @@ def parse_pgn(file):
         uci = move.uci()
         move_num = board.fullmove_number
         color = "WHITE" if board.turn == chess.WHITE else "BLACK"
+        bestMove_obj = chess.Move.from_uci(bestMove)
+        bestMove_San = board.san(bestMove_obj)
 
         board.push(move)
         evalAfter, next_best_move, mateAfter, continuation = analyze_position(engine, board)
@@ -77,7 +83,9 @@ def parse_pgn(file):
         )
 
         if color == "WHITE":
-            if classification == "Best":
+            if classification == "Brilliant":
+                whiteBrilliant += 1 
+            elif classification == "Best":
                 whiteBest += 1 
             elif classification == "Good":
                 whiteGood += 1 
@@ -88,7 +96,9 @@ def parse_pgn(file):
             else:
                 whiteBlunders += 1 
         else:
-            if classification == "Best":
+            if classification == "Brilliant":
+                whiteBrilliant += 1 
+            elif classification == "Best":
                 blackBest += 1 
             elif classification == "Good":
                 blackGood += 1 
@@ -102,7 +112,7 @@ def parse_pgn(file):
         #String notation to rebuild the entire board 
         fen = board.fen()
 
-
+        
         move_data = {
             "San": san, 
             "Uci": uci, 
@@ -110,7 +120,7 @@ def parse_pgn(file):
             "Color": color, 
             "EvalBefore": evalBefore, 
             "EvalAfter": evalAfter, 
-            "BestMove": bestMove, 
+            "BestMove": bestMove_San, 
             "EvalLoss": evalLoss, 
             "Classification": classification, 
             "Fen": fen, 
@@ -124,12 +134,14 @@ def parse_pgn(file):
         bestMove = next_best_move
         mateBefore = mateAfter
 
+    game_data["Stats"]["White"]["Brilliant"] = whiteBrilliant
     game_data["Stats"]["White"]["BestCount"] = whiteBest
     game_data["Stats"]["White"]["GoodCount"] = whiteGood
     game_data["Stats"]["White"]["Inaccuracies"] = whiteInaccuracies
     game_data["Stats"]["White"]["Mistakes"] = whiteMistakes
     game_data["Stats"]["White"]["Blunders"] = whiteBlunders
 
+    game_data["Stats"]["Black"]["Brilliant"] = blackBrilliant
     game_data["Stats"]["Black"]["BestCount"] = blackBest
     game_data["Stats"]["Black"]["GoodCount"] = blackGood
     game_data["Stats"]["Black"]["Inaccuracies"] = blackInaccuracies

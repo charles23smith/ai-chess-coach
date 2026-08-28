@@ -121,20 +121,21 @@ def print_current_analysis(game_data):
     st.write(f'Stockfish Best Move: {current_move["BestMove"]}')
 
 def display_final_stats(game_data):
-     st.subheader("Game Summary")
+    st.subheader("Game Summary")
 
-     selected_color = st.segmented_control(
+    selected_color = st.segmented_control(
           "Player", 
           ["White", "Black"], 
           default= "White"
-     )
+    )
 
-     stats = game_data["Stats"][selected_color]
+    stats = game_data["Stats"][selected_color]
 
-     col1, col2, col3, col4, col5 = st.columns(5)
+    col1, col2, col3, col4, col5 = st.columns(5)
 
-     col1.metric("Best", stats["BestCount"])
-     col1.metric("Good", stats["GoodCount"])
-     col1.metric("Inaccuracies", stats["Inaccuracies"])
-     col1.metric("Mistakes", stats["Mistakes"])
-     col1.metric("Blunders", stats["Blunders"])
+    col1.metric("Brilliant", stats["Brilliant"])
+    col1.metric("Best", stats["BestCount"])
+    col1.metric("Good", stats["GoodCount"])
+    col1.metric("Inaccuracies", stats["Inaccuracies"])
+    col1.metric("Mistakes", stats["Mistakes"])
+    col1.metric("Blunders", stats["Blunders"])

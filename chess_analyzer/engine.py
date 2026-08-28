@@ -10,7 +10,7 @@ def get_engine():
 def analyze_position(engine, board):
     info = engine.analyse(
         board, 
-        chess.engine.Limit(time=0.1)
+        chess.engine.Limit(time=0.5)
     )
 
     score = info["score"].pov(chess.WHITE)
@@ -21,7 +21,12 @@ def analyze_position(engine, board):
         mate = None
 
     evaluation = score.score(mate_score =100000)
-    continuation = info["pv"]
-    best_move = continuation[0].uci()
+    continuation = info.get("pv", [])
+
+    if continuation:
+        best_move = continuation[0].uci()
+    else:
+        best_move = None
+   
 
     return evaluation, best_move, mate, continuation
