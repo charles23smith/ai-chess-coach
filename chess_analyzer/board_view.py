@@ -29,6 +29,7 @@ def display_chess_board(game_data):
         eval_score = game_data["Moves"][0]["EvalBefore"]
         mate_in = game_data["Moves"][0]["MateAfter"]
         fill = {}
+        orientation = chess.WHITE
     else:
         current_move = game_data["Moves"][st.session_state["move_index"]]
         board = chess.Board(current_move["Fen"])
@@ -46,6 +47,19 @@ def display_chess_board(game_data):
                 to_square: "#1d809999"
         }
 
+    perspective = st.radio(
+         "Board Perspective", 
+         ["White", "Black"], 
+         key="board_orientation", 
+         horizontal=True
+    )
+
+    if perspective == "White":
+         orientation = chess.WHITE
+    else:
+         orientation = chess.BLACK
+
+
     #Evaluation bar
     if mate_in is not None:
         if mate_in > 0:
@@ -59,8 +73,9 @@ def display_chess_board(game_data):
         eval_display = f'{eval_score / 100:+.2f}'
 
     black_percent = 100 - white_percent 
-    eval_col, board_col = st.columns([1,8])
     
+    eval_col, board_col, moves_col = st.columns([1,6,4])
+            
     with eval_col:
     
         bar_html = textwrap.dedent(f"""
@@ -89,9 +104,9 @@ def display_chess_board(game_data):
     
 
     #display board, show current anaylsis of moves, and final stats
-    svg = chess.svg.board(board, fill = fill)
+    svg = chess.svg.board(board, fill = fill, orientation=orientation)
     with board_col:
-         st.image(svg)
+        st.image(svg)
 
     print_current_analysis(game_data)
 
@@ -99,6 +114,39 @@ def display_chess_board(game_data):
     if st.session_state["move_index"] == len(game_data["Moves"]) - 1:
         display_final_stats(game_data)
 
+    with moves_col:
+        move_index = st.session_state["move_index"]
+
+        if move_index == -1:
+            st.write("No Moves have been played yet.")
+
+        else:
+            visible_moves = game_data["Moves"][:move_index + 1]
+
+            rows = []
+
+            for i in range(0, len(visible_moves), 2):
+                white_move = visible_moves[i]
+
+                black_move = (
+                    visible_moves[i+1]
+                    if i + 1 < len(visible_moves)
+                    else None
+                )
+
+                rows.append({
+                    "Move": white_move["Move"], 
+                    "White": white_move["San"], 
+                    "Black": black_move["San"] if black_move else ""
+                })
+
+            st.dataframe(
+                rows, 
+                hide_index=True, 
+                use_container_width=True
+            )
+
+    
 
 def next_move(total_moves):
     if st.session_state["move_index"] < total_moves - 1:

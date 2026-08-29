@@ -1,6 +1,6 @@
 import chess.pgn
 from .engine import get_engine, analyze_position
-from .classifier import classify_move, calculate_material_loss
+from .classifier import classify_move, calculate_material_loss, calculate_sacrifice_value
 
 def parse_pgn(file):
     game = chess.pgn.read_game(file)
@@ -56,6 +56,13 @@ def parse_pgn(file):
         bestMove_obj = chess.Move.from_uci(bestMove)
         bestMove_San = board.san(bestMove_obj)
 
+        board_before = board.copy()
+
+        sacrificeValue = calculate_sacrifice_value(
+            board_before, 
+            move
+        )
+
         board.push(move)
         evalAfter, next_best_move, mateAfter, continuation = analyze_position(engine, board)
 
@@ -71,6 +78,7 @@ def parse_pgn(file):
         materialLoss = calculate_material_loss(
             board, 
             player_color, 
+            move, 
             continuation[:4]
         )
         classification = classify_move(
@@ -79,7 +87,8 @@ def parse_pgn(file):
             evalLoss, 
             materialLoss, 
             mateBefore, 
-            mateAfter
+            mateAfter, 
+            sacrificeValue
         )
 
         if color == "WHITE":
@@ -97,7 +106,7 @@ def parse_pgn(file):
                 whiteBlunders += 1 
         else:
             if classification == "Brilliant":
-                whiteBrilliant += 1 
+                blackBrilliant += 1 
             elif classification == "Best":
                 blackBest += 1 
             elif classification == "Good":
