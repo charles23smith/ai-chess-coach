@@ -2,6 +2,7 @@ import chess.svg
 import streamlit as st
 import math
 import textwrap
+from .classifier import get_classification_icon
 
 def eval_to_white_percent(eval_score):
      return 100 / (1 + math.exp(-eval_score / 400))
@@ -41,6 +42,8 @@ def display_chess_board(game_data):
         uci = current_move["Uci"]
         from_square = chess.parse_square(uci[:2])
         to_square = chess.parse_square(uci[2:4])
+        classification = current_move["Classification"]
+        icon = get_classification_icon(classification)
         
         fill = {
                 from_square: "#1d809999", 
@@ -75,6 +78,12 @@ def display_chess_board(game_data):
     black_percent = 100 - white_percent 
     
     eval_col, board_col, moves_col = st.columns([1,6,4])
+
+    show_icons = st.toggle(
+         "Show Classification Icons", 
+         value=True, 
+         key="show_classification_icons"
+    )
             
     with eval_col:
     
@@ -105,6 +114,24 @@ def display_chess_board(game_data):
 
     #display board, show current anaylsis of moves, and final stats
     svg = chess.svg.board(board, fill = fill, orientation=orientation)
+    if show_icons and st.session_state["move_index"] != -1:
+            current_move = game_data["Moves"][st.session_state["move_index"]]
+
+            to_square = chess.parse_square(
+                current_move["Uci"][2:4]
+            )
+
+            icon, color = get_classification_icon(
+                current_move["Classification"]
+            )
+
+            svg = add_classification_icon(
+                svg,
+                to_square,
+                icon,
+                color, 
+                orientation
+            )
     with board_col:
         st.image(svg)
 
@@ -187,3 +214,45 @@ def display_final_stats(game_data):
     col1.metric("Inaccuracies", stats["Inaccuracies"])
     col1.metric("Mistakes", stats["Mistakes"])
     col1.metric("Blunders", stats["Blunders"])
+
+def add_classification_icon(svg, square, icon, color, orientation):
+    
+    if not icon:
+         return svg
+    
+    file = chess.square_file(square)
+    rank = chess.square_rank(square)
+
+    square_size = 45
+
+    if orientation == chess.WHITE:
+        x = file * square_size
+        y = (7 - rank) * square_size
+    else:
+        x = (7 - file) * square_size
+        y = rank * square_size
+
+    icon_svg = f"""
+    <g>
+        <circle
+            cx="{x + square_size + 8}"
+            cy="{y + 24}"
+            r="7"
+            fill="{color}"
+            stroke="black"
+            stroke-width="1"
+        />
+        <text
+            x="{x + square_size + 8}"
+            y="{y + 27}"
+            text-anchor="middle"
+            font-size="9"
+            font-weight="bold"
+            fill="white"
+        >
+            {icon}
+        </text>
+    </g>
+    """
+
+    return svg.replace("</svg>", icon_svg + "</svg>")

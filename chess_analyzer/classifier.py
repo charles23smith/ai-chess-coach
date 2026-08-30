@@ -117,3 +117,16 @@ def calculate_sacrifice_value(board_before, move):
         return 0
 
     return sacrifice_value
+
+
+def get_classification_icon(classification):
+    icons = {
+        "Brilliant": ("!!", "#3b82f6"),     # Blue
+        "Best": ("★", "#22c55e"),           # Green
+        "Good": ("✓", "#86b96b"),           # Lighter/muted green
+        "Inaccuracy": ("?!", "#eab308"),     # Yellow
+        "Mistake": ("?", "#f97316"),         # Orange
+        "Blunder": ("??", "#ef4444")         # Red
+    }
+
+    return icons.get(classification, ("", "#777777"))
