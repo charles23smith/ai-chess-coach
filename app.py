@@ -20,7 +20,10 @@ if uploaded_games:
             pgn_text = uploaded_game.getvalue().decode("utf-8")
             pgn_file = io.StringIO(pgn_text)
 
-            st.session_state["game_data"] = parse_pgn(pgn_file)
+            progress_bar = st.progress(0, text="Analyzing PGN...")
+            st.session_state["game_data"] = parse_pgn(pgn_file, progress_bar)
+            progress_bar.empty()
+
             st.session_state["move_index"] = -1
 
         display_chess_board(st.session_state["game_data"])

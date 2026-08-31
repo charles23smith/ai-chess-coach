@@ -2,7 +2,7 @@ import chess.pgn
 from .engine import get_engine, analyze_position
 from .classifier import classify_move, calculate_material_loss, calculate_sacrifice_value
 
-def parse_pgn(file):
+def parse_pgn(file, progress_bar=None):
     game = chess.pgn.read_game(file)
     board = game.board()
 
@@ -46,9 +46,11 @@ def parse_pgn(file):
 
     engine = get_engine()
     evalBefore, bestMove, mateBefore, _ = analyze_position(engine, board)
+    moves = list(game.mainline_moves())
+    total_moves = len(moves)
     
     
-    for move in game.mainline_moves():
+    for index, move in enumerate(moves):
         san = board.san(move)
         uci = move.uci()
         move_num = board.fullmove_number
@@ -76,7 +78,7 @@ def parse_pgn(file):
         evalLoss = max(0, evalLoss)
         player_color = chess.WHITE if color == "WHITE" else chess.BLACK
         materialLoss = calculate_material_loss(
-            board, 
+            board_before, 
             player_color, 
             move, 
             continuation[:4]
@@ -139,6 +141,11 @@ def parse_pgn(file):
         }
         game_data["Moves"].append(move_data)
 
+        if progress_bar is not None and total_moves > 0:
+            progress = (index + 1) / total_moves
+
+            progress_bar.progress(progress, text=f'Analyzing move {index + 1} of {total_moves}')
+
         evalBefore = evalAfter
         bestMove = next_best_move
         mateBefore = mateAfter
@@ -157,7 +164,8 @@ def parse_pgn(file):
     game_data["Stats"]["Black"]["Mistakes"] = blackMistakes
     game_data["Stats"]["Black"]["Blunders"] = blackBlunders
     
-
+    if progress_bar is not None:
+        progress_bar.progress(1.0, text="Analysis Complete!")
     engine.quit()
 
     return game_data
